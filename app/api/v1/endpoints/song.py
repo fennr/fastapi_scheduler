@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app import crud  # isort:skip
-from app.db import get_session  # isort:skip
-from app.models.song import SongCreate, SongRead, SongUpdate  # isort:skip
+from app import crud
+from app.db import get_session
+from app.models.song import SongCreate, SongRead, SongUpdate
 
 router = APIRouter()
 

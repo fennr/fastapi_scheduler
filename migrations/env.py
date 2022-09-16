@@ -5,9 +5,9 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import AsyncEngine
-from sqlmodel import SQLModel  # NEW
+from sqlmodel import SQLModel
 
-from app.models.song import Song  # isort:skip # NEW
+from app.models.song import Song
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -22,7 +22,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = SQLModel.metadata  # UPDATED
+target_metadata = SQLModel.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
