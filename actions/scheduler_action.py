@@ -2,6 +2,8 @@ import requests
 
 from app.sdk import ActionRequest, ActionResponse
 
+request = ActionRequest(query='Test request', variables={'x': 1})
+
 
 class Constants:
     """Изменяемые константы"""
@@ -10,7 +12,7 @@ class Constants:
     ACTION = 'action'       # Действие
     USER = 'mobile_phone'   # Логин
     DESC = 'dance'          # Описание
-    DATE = 'date'           # Дата
+    DATE = 'date'         # Дата
 
 
 c = Constants()
