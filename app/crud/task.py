@@ -1,4 +1,3 @@
-
 from app.models.task import Task, TaskCreate, TaskUpdate
 
 from .base import CRUDBase
