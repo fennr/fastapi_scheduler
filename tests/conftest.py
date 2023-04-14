@@ -3,7 +3,6 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import Session, SQLModel
-from sqlmodel.pool import StaticPool
 
 from app.db import get_session
 from app.main import app
@@ -13,19 +12,25 @@ from app.main import app
 async def session_fixture():  #
 
     engine = create_async_engine(
-        'sqlite+aiosqlite:///test.sqlite3',
-        connect_args={'check_same_thread': False},
-        poolclass=StaticPool,
+        'postgresql+asyncpg://postgres:postgres@localhost:5432/postgres',
+        # poolclass=StaticPool,
     )
-    AsyncSessionLocal = sessionmaker(
-        engine,
-        class_=AsyncSession,
-        expire_on_commit=False,
-    )
-    async with engine.begin() as conn:
+    async with engine.connect() as conn:
+        # await conn.begin()
+        await conn.begin_nested()
         await conn.run_sync(SQLModel.metadata.create_all)
-    async with AsyncSessionLocal() as session:
-        yield session
+        AsyncSessionLocal = sessionmaker(
+            class_=AsyncSession,
+            expire_on_commit=False,
+            autocommit=False,
+            autoflush=False,
+            bind=conn,
+            future=True,
+        )
+        async with AsyncSessionLocal() as session:
+            yield session
+            await session.close()
+            await conn.rollback()
 
 
 @pytest.fixture(name='client')  #
