@@ -3,9 +3,9 @@ from typing import Generic, Optional, Type, TypeVar, Union
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import SQLModel, select
 
-ModelType = TypeVar("ModelType", bound=SQLModel)
-CreateModelType = TypeVar("CreateModelType", bound=SQLModel)
-UpdateModelType = TypeVar("UpdateModelType", bound=SQLModel)
+ModelType = TypeVar('ModelType', bound=SQLModel)
+CreateModelType = TypeVar('CreateModelType', bound=SQLModel)
+UpdateModelType = TypeVar('UpdateModelType', bound=SQLModel)
 
 
 class CRUDBase(Generic[ModelType, CreateModelType, UpdateModelType]):

@@ -1,28 +1,28 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
-from app.models.task import Task, TaskCreate, TaskUpdate
+from app.models.remind import Remind, RemindCreate, RemindUpdate
 
 from .base import CRUDBase
 
 
-class CRUDTask(CRUDBase[Task, TaskCreate, TaskUpdate]):
-    async def get_by_user(
+class CRUDRemind(CRUDBase[Remind, RemindCreate, RemindUpdate]):
+    async def get_task_reminds(
         self,
         *,
         session: AsyncSession,
         offset: int = 0,
         limit: int = 100,
-        user_id: int,
-    ) -> list[Task]:
+        task_id: int,
+    ) -> list[Remind]:
         statement = (
             select(self.model)
             .limit(limit)
             .offset(offset)
-            .where(Task.user_id == user_id)
+            .where(Remind.task_id == task_id)
         )
         result = await session.execute(statement)
         return result.scalars().all()
 
 
-task = CRUDTask(Task)
+remind = CRUDRemind(Remind)

@@ -1,42 +1,34 @@
 from datetime import datetime
-from typing import Optional
 
-from sqlmodel import TIMESTAMP, Column, Field, SQLModel, func
+from sqlmodel import Field, SQLModel
+
+from app.models.utils import get_sa_column
 
 
 class TaskBase(SQLModel):
-    user: str = Field(index=True, title='Пользователь')
-    description: str = Field(index=True, title='Описание события')
-    dtime: datetime = Field(
-        sa_column=Column(
-            TIMESTAMP(timezone=True),
-            nullable=False,
-            default=datetime.now(),
-            server_default=func.now(),
-        )
+    description: str = Field(
+        index=True, nullable=False, title='Описание события'
     )
-
-
-class Task(TaskBase, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    place: str | None = Field(title='Место проведения')
+    dtime: datetime = Field(sa_column=get_sa_column())
+    user_id: int | None = Field(foreign_key='user.id')
+    # user: User = Relationship(back_populates='tasks')
+    created_at: datetime = Field(sa_column=get_sa_column())
 
 
 class TaskCreate(TaskBase):
-    pass
+    ...
+
+
+class Task(TaskBase, table=True):
+    id: int = Field(default=None, primary_key=True)
 
 
 class TaskRead(Task):
-    pass
+    ...
 
 
 class TaskUpdate(SQLModel):
-    user: Optional[str] = Field(index=True)
-    description: Optional[str] = Field(index=True)
-    dtime: datetime = Field(
-        sa_column=Column(
-            TIMESTAMP(timezone=True),
-            nullable=False,
-            default=datetime.now(),
-            server_default=func.now(),
-        )
-    )
+    description: str | None = Field(index=True)
+    place: str | None = Field(title='Место проведения')
+    dtime: datetime | None = Field(sa_column=get_sa_column())
