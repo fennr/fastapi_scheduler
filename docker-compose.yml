@@ -6,9 +6,18 @@ services:
     restart: unless-stopped
     ports:
       - 8000:8000
-    networks:
-      example-network:
-        ipv4_address: 172.16.237.10
+
+  db:
+    image: postgres:latest
+    ports:
+      - 5434:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    user: postgres
 
   prometheus:
     image: prom/prometheus:latest
@@ -20,9 +29,6 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
-    networks:
-      example-network:
-        ipv4_address: 172.16.237.11
 
   grafana:
     image: grafana/grafana:latest
@@ -32,19 +38,11 @@ services:
     depends_on:
       - prometheus
     ports:
-      - 3000:3000
+      - 3001:3000
     volumes:
       - ./datasource.yml:/etc/grafana/provisioning/datasource.yml
     env_file:
       - ./config.monitoring
-    networks:
-      example-network:
-        ipv4_address: 172.16.237.12
 
-networks:
-  example-network:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.16.237.0/24
+volumes:
+  postgres_data:

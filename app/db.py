@@ -4,13 +4,13 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel
 
-DATABASE_URL = 'sqlite+aiosqlite:///db.sqlite3'
+# DATABASE_URL = 'sqlite+aiosqlite:///db.sqlite3'
+DATABASE_URL = 'postgresql+asyncpg://postgres:postgres@localhost:5432/postgres'
 
 engine = create_async_engine(
     DATABASE_URL,
     echo=True,
     future=True,
-    connect_args={'check_same_thread': False},
 )
 
 AsyncSessionLocal = sessionmaker(

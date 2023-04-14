@@ -21,8 +21,6 @@ WORKDIR /ds
 
 COPY pyproject.toml poetry.lock ./
 
-COPY db.sqlite3 ./
-
 RUN poetry config virtualenvs.in-project true && \
   poetry lock && \
   poetry install --no-root --without dev
