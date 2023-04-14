@@ -7,7 +7,10 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlmodel import SQLModel
 
+from app.models.remind import Remind  # noqa: ignore
 from app.models.task import Task  # noqa: ignore
+from app.models.user import User  # noqa: ignore
+from app.models.user_data import UserData  # noqa: ignore
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
