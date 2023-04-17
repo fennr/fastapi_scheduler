@@ -1,5 +1,7 @@
+import pytest
 from httpx import AsyncClient
 
+from app.exceptions import UserException
 from app.models.user import User
 from app.models.user_data import UserData
 from tests.data import USERS
@@ -23,6 +25,8 @@ async def create_user_data(
         'data': user_data_json,
     }
     r = await client.post('/user_data/', json=data)
+    if r.status_code not in [200, 201]:
+        raise UserException(status_code=404, detail='Test error')
     return UserData(**r.json())
 
 
@@ -30,6 +34,13 @@ async def test_create_user_data(client):
     user = await create_user(client)
     user_data = await create_user_data(client, user.id, {'x': 1})
     assert user_data.data['x'] == 1
+
+
+async def test_create_with_bad_user(client):
+    fake_user_id = 0
+    with pytest.raises(UserException) as exc_info:
+        await create_user_data(client, fake_user_id, {'x': 1})
+    assert exc_info.value.status_code == 404
 
 
 async def test_append_user_data(client):

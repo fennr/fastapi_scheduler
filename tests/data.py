@@ -30,31 +30,32 @@ USERS = {
 
 TASKS = {
     'good_task': {
-        'user_id': 1,
         'description': 'Совещание',
         'place': 'Переговорная',
         'dtime': dtime,
         'created_at': dtime,
     },
     'good_task2': {
-        'user_id': 1,
         'description': 'Встреча',
         'place': 'Новое место',
         'dtime': dtime,
         'created_at': dtime,
     },
     'bad_task1': {
-        'user_id': 0,
         'description': 'Bad user_id',
         'place': '',
         'dtime': dtime,
         'created_at': dtime,
     },
     'bad_task2': {
-        'user_id': 1,
         'description': None,
         'place': '',
         'dtime': dtime,
         'created_at': dtime,
     },
+}
+
+
+REMINDS = {
+    'good_remind': {'connector': 'tg', 'dtime': dtime, 'created_at': dtime}
 }
