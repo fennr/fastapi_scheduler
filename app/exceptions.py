@@ -24,6 +24,10 @@ class RemindException(SchedulerException):
     """
 
 
+class UserExist(UserException):
+    ...
+
+
 class UserNotFound(UserException):
     ...
 

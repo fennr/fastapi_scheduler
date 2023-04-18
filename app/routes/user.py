@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, status
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import crud
 from app.db import get_session
-from app.exceptions import UserNotFound
+from app.exceptions import UserExist, UserNotFound
 from app.models.user import User, UserCreate, UserUpdate
 
 router = APIRouter()
@@ -21,6 +22,19 @@ async def get_user_by_id(
     return user
 
 
+async def create_user_if_not_exist(
+    user_obj: UserCreate, session=Depends(get_session)
+) -> User:
+    try:
+        user = await crud.user.create(session, obj=user_obj)
+    except IntegrityError:
+        raise UserExist(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='User already exist',
+        )
+    return user
+
+
 @router.get('/', response_model=list[User])
 async def get_users(
     session: AsyncSession = Depends(get_session),
@@ -33,10 +47,9 @@ async def get_users(
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=User)
 async def create_user(
     *,
-    session: AsyncSession = Depends(get_session),
-    user: UserCreate,
+    user: User = Depends(create_user_if_not_exist),
 ) -> User:
-    return await crud.user.create(session, obj=user)
+    return user
 
 
 @router.get('/{user_id}', status_code=status.HTTP_200_OK, response_model=User)

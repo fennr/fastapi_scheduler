@@ -19,6 +19,15 @@ async def test_create_user_good(client):
     assert r.status_code == 201
 
 
+async def test_try_create_double(client):
+    r = await client.post('/user/', json=USERS['good_user'])
+    assert r.status_code == 201
+
+    # Уже существует, вернется 400 статус
+    r = await client.post('/user/', json=USERS['good_user'])
+    assert r.status_code == 400
+
+
 async def test_post_user_bad(client):
     r = await client.post('/user/', json=USERS['bad_user'])
     print(r.json())
