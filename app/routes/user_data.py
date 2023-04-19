@@ -1,22 +1,20 @@
 from fastapi import APIRouter, Depends, status
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel.sql.expression import select
 
 from app import crud
 from app.db import get_session
-from app.models.user_data import (
-    UserData,
-    UserDataCreate,
-    UserDataRead,
-    UserDataUpdate,
-)
+from app.exceptions import UserDataNotFound
+from app.models.user_data import (UserData, UserDataCreate, UserDataRead,
+                                  UserDataUpdate)
 from app.routes.user import get_user_by_id
 
 router = APIRouter()
 
 
 async def user_datas(
-    user_id: int, core_id: int, session: AsyncSession = Depends(get_session)
+    user_id: int, core_id: str, session: AsyncSession = Depends(get_session)
 ) -> UserData:
     await crud.user.get(session=session, id=user_id)
     statement = (
@@ -25,7 +23,14 @@ async def user_datas(
         .where(UserData.core_id == core_id)
     )
     result = await session.execute(statement)
-    return result.scalars().one()
+    try:
+        user_data = result.scalars().one()
+    except NoResultFound:
+        raise UserDataNotFound(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'Data with User={user_id} and core_id={core_id} not found',
+        )
+    return user_data
 
 
 @router.post(

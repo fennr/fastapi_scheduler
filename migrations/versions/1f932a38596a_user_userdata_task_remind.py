@@ -1,8 +1,8 @@
-"""create User UserData Task Remind
+"""User UserData Task Remind
 
-Revision ID: f93788902a22
+Revision ID: 1f932a38596a
 Revises: 
-Create Date: 2023-04-14 16:30:17.256755
+Create Date: 2023-04-19 11:57:15.345240
 
 """
 from alembic import op
@@ -11,7 +11,7 @@ import sqlmodel
 
 
 # revision identifiers, used by Alembic.
-revision = 'f93788902a22'
+revision = '1f932a38596a'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -33,7 +33,7 @@ def upgrade() -> None:
     sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('description', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('place', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -42,7 +42,7 @@ def upgrade() -> None:
     op.create_table('userdata',
     sa.Column('data', sa.JSON(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('core_id', sa.Integer(), nullable=False),
+    sa.Column('core_id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('user_id', 'core_id')
     )

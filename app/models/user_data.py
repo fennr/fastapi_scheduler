@@ -1,11 +1,10 @@
-from typing import Optional
 
 from sqlmodel import JSON, Column, Field, SQLModel
 
 
 class UserDataBase(SQLModel):
     user_id: int = Field(primary_key=True, foreign_key=('user.id'))
-    core_id: Optional[int] = Field(primary_key=True, default=None)
+    core_id: str = Field(primary_key=True, default=None)
     data: dict = Field(default={}, sa_column=Column(JSON))
 
 

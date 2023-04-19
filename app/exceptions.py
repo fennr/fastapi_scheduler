@@ -32,6 +32,10 @@ class UserNotFound(UserException):
     ...
 
 
+class UserDataNotFound(UserException):
+    ...
+
+
 class TaskNotFound(TaskException):
     ...
 

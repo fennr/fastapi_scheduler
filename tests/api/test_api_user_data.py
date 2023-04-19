@@ -1,9 +1,10 @@
 import pytest
 from httpx import AsyncClient
 
-from app.exceptions import UserException
+from app.exceptions import UserDataNotFound, UserException
 from app.models.user import User
 from app.models.user_data import UserData
+from app.routes.user_data import user_datas
 from tests.data import USERS
 
 CORE_ID = '123'
@@ -40,6 +41,27 @@ async def test_create_with_bad_user(client):
     fake_user_id = 0
     with pytest.raises(UserException) as exc_info:
         await create_user_data(client, fake_user_id, {'x': 1})
+    assert exc_info.value.status_code == 404
+
+
+async def test_get_user_data(client, session):
+    user = await create_user(client)
+    user_data_db = await create_user_data(client, user.id, {'x': 1})
+    # проверка функции Depends
+    user_data = await user_datas(user.id, CORE_ID, session)
+    assert user_data == user_data_db
+    # проверка API
+    r = await client.get(f'/user_data/{user.id}?core_id={CORE_ID}')
+    user_data = UserData(**r.json())
+    assert user_data == user_data_db
+
+
+async def test_get_user_data_not_found(client, session):
+    user = await create_user(client)
+    await create_user_data(client, user.id, {'x': 1})
+    # проверка функции Depends
+    with pytest.raises(UserDataNotFound) as exc_info:
+        await user_datas(user.id, CORE_ID + 'aaa', session)
     assert exc_info.value.status_code == 404
 
 
