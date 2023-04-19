@@ -3,7 +3,7 @@ from httpx import AsyncClient
 
 from app.exceptions import UserNotFound
 from app.models.user import User
-from app.routes.user import get_user_by_id
+from app.routes.user import get_social_user, get_user_by_id
 from tests.data import USERS
 
 
@@ -57,6 +57,16 @@ async def test_get_user_api(client):
 
     r = await client.get('/user/0')
     assert r.status_code == 404
+
+
+async def test_get_social_user(client, session):
+    user_db = await create_user(client)
+
+    [user1] = await get_social_user(tg=user_db.tg, session=session)
+    assert user1 == user_db
+
+    [user2] = await get_social_user(vk=user_db.vk, session=session)
+    assert user2 == user_db
 
 
 async def test_delete_user(client):

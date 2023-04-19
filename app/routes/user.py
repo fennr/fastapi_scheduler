@@ -13,7 +13,7 @@ router = APIRouter()
 async def get_user_by_id(
     user_id: int, session: AsyncSession = Depends(get_session)
 ) -> User:
-    user = await crud.user.get(session=session, id=user_id)
+    user = await crud.user.get(session, id=user_id)
     if not user:   # pragma: no cover
         raise UserNotFound(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -26,22 +26,42 @@ async def create_user_if_not_exist(
     user_obj: UserCreate, session=Depends(get_session)
 ) -> User:
     try:
-        user = await crud.user.create(session, obj=user_obj)
+        return await crud.user.create(session, obj=user_obj)
     except IntegrityError:
         raise UserExist(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='User already exist',
         )
-    return user
+
+
+async def get_exist_user(session, *, obj: UserCreate) -> User | None:
+    user_tg = await get_social_user(session, tg=obj.tg)
+    user_vk = await get_social_user(session, vk=obj.vk)
+    if user_tg:
+        return user_tg[0]
+    if user_vk:
+        return user_vk[0]
+    return None
+
+
+async def get_social_user(
+    session=Depends(get_session),
+    vk: str | None = None,
+    tg: str | None = None,
+) -> list[User]:
+    if tg:
+        return [await crud.user.get_tg_user(session, tg=tg)]
+    elif vk:
+        return [await crud.user.get_vk_user(session, vk=vk)]
+    else:
+        return await crud.user.get_batch(session, limit=100, offset=0)
 
 
 @router.get('/', response_model=list[User])
 async def get_users(
-    session: AsyncSession = Depends(get_session),
-    offset: int = 0,
-    limit: int = 100,
+    users=Depends(get_social_user),
 ) -> list[User]:
-    return await crud.user.get_batch(session, limit=limit, offset=offset)
+    return users
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=User)
