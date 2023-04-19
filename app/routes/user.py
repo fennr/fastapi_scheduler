@@ -29,7 +29,7 @@ async def create_user_if_not_exist(
         return await crud.user.create(session, obj=user_obj)
     except IntegrityError:
         raise UserExist(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_409_CONFLICT,
             detail='User already exist',
         )
 

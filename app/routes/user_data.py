@@ -63,6 +63,6 @@ async def update_user_data(
     status_code=status.HTTP_200_OK,
 )
 async def get_user_data(
-    core_id: int, user_data: UserDataRead = Depends(user_datas)
+    core_id: str, user_data: UserDataRead = Depends(user_datas)
 ) -> UserDataRead:
     return user_data
