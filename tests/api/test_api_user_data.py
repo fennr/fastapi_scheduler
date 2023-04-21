@@ -87,3 +87,12 @@ async def test_append_user_data(client):
     assert user_data_new.data['x'] == 2
     assert user_data_new.data['z'] == 3
     assert user_data_new.data['y'] == 5
+
+
+async def test_append_new_data(client):
+    user = await create_user(client)
+    put_data = {'data': {'test': 123}}
+    r = await client.put(
+        f'/user_data/{user.id}?core_id={CORE_ID}', json=put_data
+    )
+    assert r.status_code == 201

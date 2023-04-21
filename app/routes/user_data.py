@@ -6,8 +6,12 @@ from sqlmodel.sql.expression import select
 from app import crud
 from app.db import get_session
 from app.exceptions import UserDataNotFound
-from app.models.user_data import (UserData, UserDataCreate, UserDataRead,
-                                  UserDataUpdate)
+from app.models.user_data import (
+    UserData,
+    UserDataCreate,
+    UserDataRead,
+    UserDataUpdate,
+)
 from app.routes.user import get_user_by_id
 
 router = APIRouter()
@@ -50,11 +54,35 @@ async def update_user_data(
     *,
     session: AsyncSession = Depends(get_session),
     user_data: UserDataUpdate,
-    db_user_data: UserData = Depends(user_datas),
+    user_id: int,
+    core_id: str,
 ) -> UserData:
-    user_data.data = {**db_user_data.data, **user_data.data}
+    try:
+        db_user_data = await user_datas(
+            user_id=user_id, core_id=core_id, session=session
+        )
+    except UserDataNotFound:
+        new_data = UserDataCreate(
+            user_id=user_id, core_id=core_id, data=user_data.data
+        )
+        db_user_data = await create_user_data(
+            session=session, user_data=new_data
+        )
+        return db_user_data
+    else:
+        user_data.data = {**db_user_data.data, **user_data.data}
+        return await crud.user_data.update(
+            session, db_obj=db_user_data, obj=user_data
+        )
+
+
+@router.delete('/{user_id}', response_model=UserData)
+async def clear_user_data(
+    *, session=Depends(get_session), db_user_data=Depends(user_datas)
+):
+    db_user_data.data = {}
     return await crud.user_data.update(
-        session, db_obj=db_user_data, obj=user_data
+        session, db_obj=db_user_data, obj=db_user_data
     )
 
 
@@ -63,6 +91,6 @@ async def update_user_data(
     status_code=status.HTTP_200_OK,
 )
 async def get_user_data(
-    core_id: str, user_data: UserDataRead = Depends(user_datas)
+    user_data: UserDataRead = Depends(user_datas),
 ) -> UserDataRead:
     return user_data

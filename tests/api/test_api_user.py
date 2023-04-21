@@ -19,13 +19,13 @@ async def test_create_user_good(client):
     assert r.status_code == 201
 
 
-async def test_try_create_double(client):
+async def test_create_conflict(client):
     r = await client.post('/user/', json=USERS['good_user'])
     assert r.status_code == 201
 
-    # Уже существует, вернется 400 статус
+    # Уже существует, вернется 409 статус
     r = await client.post('/user/', json=USERS['good_user'])
-    assert r.status_code == 400
+    assert r.status_code == 409
 
 
 async def test_post_user_bad(client):
