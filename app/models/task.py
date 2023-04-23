@@ -12,7 +12,6 @@ class TaskBase(SQLModel):
     place: str | None = Field(title='Место проведения')
     dtime: datetime = Field(sa_column=get_sa_column())
     user_id: int = Field(foreign_key='user.id')
-    # user: User = Relationship(back_populates='tasks')
     created_at: datetime = Field(sa_column=get_sa_column())
 
 

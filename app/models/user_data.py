@@ -13,8 +13,6 @@ class UserDataCreate(UserDataBase):
 
 class UserData(UserDataBase, table=True):
     ...
-    # id: int = Field(default=None, primary_key=True)
-    # user: Optional[User] = Relationship(back_populates='data')
 
 
 class UserDataRead(UserData):

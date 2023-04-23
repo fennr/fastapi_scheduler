@@ -9,8 +9,6 @@ from app.models.utils import get_sa_column
 class UserBase(SQLModel):
     tg: Optional[str] = Field(index=True, unique=True)
     vk: Optional[str] = Field(index=True, unique=True)
-    # data: list['UserData'] = Relationship(back_populates='user')
-    # tasks: list['Task'] = Relationship(back_populates='user')
     created_at: datetime = Field(sa_column=get_sa_column())
 
 
